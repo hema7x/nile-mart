@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:annotation-config/>
+    <context:property-placeholder location="classpath:application.properties"/>
+    <bean id="zoneShippingCalculator" class="org.route.ZoneShippingCalculator"/>
+    <bean id="freeShipping" class="org.route.FreeShippingCalculator"/>
+    <bean id="shippingQuoteService" class="org.route.ShippingQuoteService">
+        <constructor-arg ref="zoneShippingCalculator"/>
+        <constructor-arg ref="freeShipping"/>
+        <constructor-arg value="${store.free-shipping-threshold}"/>
+    </bean>
+
+    <bean id="standardPricing" class="org.route.StandardPricingService"/>
+    <bean id="promotionalPricing" class="org.route.PromotionalPricingService">
+        <constructor-arg value="20"/>
+    </bean>
+
+    <bean id="inMemoryRepo" class="org.route.InMemoryProductRepository"/>
+
+    <bean id="productService" class="org.route.ProductService" scope="prototype">
+        <constructor-arg ref="inMemoryRepo"/>
+        <constructor-arg ref="standardPricing"/>
+    </bean>
+</beans>
